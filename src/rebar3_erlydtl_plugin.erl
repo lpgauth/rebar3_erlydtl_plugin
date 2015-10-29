@@ -198,14 +198,10 @@ do_compile(Source, Target, DtlOpts, Dir, OutDir) ->
     case erlydtl:compile(ec_cnv:to_list(Source),
                               list_to_atom(module_name(Target)),
                               Opts) of
-        {ok, _Mod} ->
+        ok ->
             ok;
-        {ok, _Mod, Ws} ->
-            rebar_base_compiler:ok_tuple(Source, Ws);
-        error ->
-            rebar_base_compiler:error_tuple(Source, [], [], Opts);
-        {error, Es, Ws} ->
-            rebar_base_compiler:error_tuple(Source, Es, Ws, Opts)
+        {error, Reason} ->
+            rebar_base_compiler:error_tuple(Source, Reason, [], Opts)
     end.
 
 module_name(Target) ->
