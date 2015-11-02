@@ -195,13 +195,17 @@ do_compile(Source, Target, DtlOpts, Dir, OutDir) ->
     Opts = lists:ukeymerge(1, DtlOpts, Sorted),
     rebar_api:debug("Compiling \"~s\" -> \"~s\" with options:~n    ~s",
                     [Source, Target, io_lib:format("~p", [Opts])]),
-    case erlydtl:compile(ec_cnv:to_list(Source),
+    case erlydtl:compile_file(ec_cnv:to_list(Source),
                               list_to_atom(module_name(Target)),
                               Opts) of
-        ok ->
+        {ok, _Mod} ->
             ok;
-        {error, Reason} ->
-            rebar_base_compiler:error_tuple(Source, Reason, [], Opts)
+        {ok, _Mod, Ws} ->
+            rebar_base_compiler:ok_tuple(Source, Ws);
+        error ->
+            rebar_base_compiler:error_tuple(Source, [], [], Opts);
+        {error, Es, Ws} ->
+            rebar_base_compiler:error_tuple(Source, Es, Ws, Opts)
     end.
 
 module_name(Target) ->
